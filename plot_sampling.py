@@ -12,20 +12,16 @@ pic_dir = f"{base_dir}/pic/sampling"
 if not os.path.exists(pic_dir):
     os.makedirs(pic_dir)
 
-# data_list = ["parkinsons", "vertebral","ionosphere", "climate", "blod", "breast","bank", "QSAR" ,"spambase", "madelon" ] # 
-data_list = ["spambase", "madelon"]
+data_list = ["parkinsons", "vertebral","ionosphere", "climate", "blod", "breast","bank", "QSAR" ,"spambase", "madelon" ] # 
 algo = "PW"
-run_name = "PW_k20"
-# result_type = "random"
+run_name = "Paper_results_main"
+
 for data in data_list:
 
     # prameters ############################################################################################################################################
 
-    plot_name   = f"{data}_{algo}_k20"
-    # plot_name   = f"{data}_random"
+    plot_name   = f"{data}_{algo}"
     query       = f"SELECT results, id, prams, result_type FROM experiments Where dataset='Jdata/{data}' AND algo='{algo}' AND run_name='{run_name}'" #  AND result_type='{result_type}'
-    # query       = f"SELECT results, id, prams, result_type, run_name FROM experiments Where id>='3390'"
-    # query       = f"SELECT results, id, prams, result_type FROM experiments Where id='3381' or id='3382'or id='3383'"
 
     ########################################################################################################################################################
 
@@ -70,32 +66,6 @@ for data in data_list:
         v_index_e = prams.index("}", v_index_s)
         batch_size = int(prams[v_index_s+len(search_pram) : v_index_e])
         # legend += "Batch: " + str(batch_size)
-
-        # prams = str(job[2])
-        # pram_name = "PCA"
-        # search_pram = f"'{pram_name}': "
-        # v_index_s = prams.index(search_pram)
-        # v_index_e = prams.index(",", v_index_s)
-        # pca = int(prams[v_index_s+len(search_pram) : v_index_e])
-        # legend += "PCA: " + str(pca)
-
-
-        # prams = str(job[2])
-        # pram_name = "max_depth"
-        # search_pram = f"'{pram_name}': "
-        # v_index_s = prams.index(search_pram)
-        # v_index_e = prams.index(",", v_index_s)
-        # max_depth = int(prams[v_index_s+len(search_pram) : v_index_e])
-        # legend += "Depth: " + str(max_depth)
-
-        # prams = str(job[2])
-        # pram_name = "min_samples_leaf"
-        # search_pram = f"'{pram_name}': "
-        # v_index_s = prams.index(search_pram)
-        # v_index_e = prams.index(",", v_index_s)
-        # min_leaf = int(prams[v_index_s+len(search_pram) : v_index_e])
-        # legend += "min: " + str(min_leaf)
-
 
         for text in job[3:]:
             legend += " " +str(text) 

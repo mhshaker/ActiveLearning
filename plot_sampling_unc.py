@@ -13,8 +13,6 @@ if not os.path.exists(pic_dir):
     os.makedirs(pic_dir)
 
 data_list = ["parkinsons", "vertebral","ionosphere", "climate", "blod", "breast","bank", "QSAR"] #   ,"spambase", "madelon"
-# data_list = ["anthracyclineTaxaneChemotherapy","AP_Breast_Uterus","Dorothea","gisette","OVA_Prostate"]
-# data_list = ["vertebral"]
 algo = "LR"
 run_name = "Paper_results_main"
 unc = "rl_e"
@@ -25,8 +23,6 @@ for data in data_list:
     plot_name   = f"{data}_{algo}_unc"
     # plot_name   = run_name
     query       = f"SELECT results, id, prams, result_type FROM experiments Where dataset='Jdata/{data}' AND algo='{algo}' AND run_name='{run_name}' AND result_type='{unc}'" # 
-    # query       = f"SELECT results, id, prams, result_type FROM experiments Where id=3133"
-    # query       = f"SELECT results, id, prams, result_type FROM experiments Where id='3085' or id='3127'"
 
     ########################################################################################################################################################
 

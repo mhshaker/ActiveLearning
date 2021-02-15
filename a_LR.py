@@ -14,41 +14,6 @@ from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
 from sklearn.metrics import accuracy_score
 import UncertaintyM as unc
-# import bigfloat
-#%%
-# def logistic_regression(betas, X, Y):
-#     return - np.sum(Y*(X @ betas)) + np.sum(np.log(1.0 + np.exp(X @ betas))) + 0.5*sum([i*j for (i, j) in zip(betas, betas)])
-
-# def logistic_regression_deriv(betas, X, Y):  
-#     grad = np.dot(expit(X @ betas) - Y, X)
-#     grad = [grad[ind] + betas[ind] for ind in range(len(betas))] 
-#     return np.asarray(grad)
-
-# def logistic_regression_Hess(betas, X, Y):
-#     pi = expit(X @ betas)
-#     dia = [pi_ele * (1- pi_ele) for pi_ele in pi]
-#     Hess = (X.T @ np.diag(dia)) @ X
-#     diaAdd = [1 for ind in range(len(betas))]
-#     return np.asarray(np.add(Hess, np.diag(diaAdd)))
-# #%%
-# def findMLE(X, Y):
-#     i = 0
-#     lll_list = []
-#     x_list = []
-#     while (i<100):
-#         result = optimize.minimize(logistic_regression,  np.random.uniform(0, 1, len(X[0])), method='Newton-CG', jac=logistic_regression_deriv,
-#                     hess=logistic_regression_Hess, args=(X, Y), options={'disp': False})
-#         i +=1
-#         if (result.success):
-#             lll = - logistic_regression(result.x, X, Y)     
-#             return [result.x,lll, result.success]
-#         lll_list.append(- logistic_regression(result.x, X, Y))
-#         x_list.append(result.x)
-#         ind_max = lll_list.index(max(lll_list))
-#     print("Error when finding MLL ^_^")
-#     print("Randomly repeat 100 times and chose results correspond to time with the highest MLL!")
-#     return [x_list[ind_max], lll_list[ind_max], result.success]
-
 
 
 ########### regularization without intercept
@@ -265,23 +230,6 @@ def LR_run(X_train, X_pool, Y_train, Y_pool, prams, unc_method, seed, x_test, y_
 
     # return prediction, t_unc_U, e_unc_U, a_unc_U, betasMll
     return prediction, total_uncertainty, epistemic_uncertainty, aleatoric_uncertainty, model
-
-
-# for fileName in ["parkinsons.csv"]:
-#     seed = 42
-#     prams = 100
-#     XY = LoadCsvFile(fileName)
-#     X = np.array([xy[:-1] for xy in XY])
-#     Y = [xy[-1:][0] for xy in XY]
-#     Y = np.array([0 if y < 0 else 1 for y in Y])
-#     normalizer = preprocessing.Normalizer().fit(X) # see https://stats.stackexchange.com/questions/19523/need-for-centering-and-standardizing-data-in-regression
-#     X = normalizer.transform(X)
-#     X_train, X_pool, Y_train, Y_pool = train_test_split(X, Y, test_size=0.9, random_state=seed)
-#     _ , t_unc_U, e_unc_U, a_unc_U, model = compute_Epistemic_Aleatoric_Entropy(X_train, X_pool, Y_train, Y_pool, prams, seed) # run model
-#     print(["Epistemic uncertainty", e_unc_U])
-#     print(["Aleatoric uncertainty", a_unc_U])
-
-
 
 
 class LR_model(object):

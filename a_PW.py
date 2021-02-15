@@ -100,11 +100,7 @@ def Interval_probability(total_number, positive_number):
     return [1/(1+valUp), 1/(1+valLow)]
 #%%
 def Credal_Uncertainty(total_number, positive_number):
-    # credal uncertainty is maximized by [lower_probability, upper_probability] = [0,1]
     lower_probability, upper_probability = Interval_probability(total_number, positive_number) 
-    # due to the observation that in binary classification 
-    # lower_probability_0 = 1-upper_probability_1 
-    # upper_probability_0 = 1-lower_probability_1
     return -max(lower_probability/(1-lower_probability),(1-upper_probability)/upper_probability) 
 
 #%%
@@ -139,22 +135,9 @@ def PW_run(X_train, X_pool, Y_train, Y_pool, prams, unc_method, seed, X_test, y_
     if   "ent" in unc_method:
         total_uncertainty, epistemic_uncertainty, aleatoric_uncertainty = unc.uncertainty_ent_standard(np.array(porb_matrix_pool))
     elif "rl" in unc_method:
-        # for indp in range(len(X_pool)):
-        #     e_unc, a_unc = epistemicAndAleatoric(total_neighbors[indp], positive_neighbors[indp])
-            
-        #     rl_e[indp] = e_unc
-        #     rl_a[indp] = a_unc
-        # print("------------------------------------")
-        # print(total_neighbors.shape)
-        # print(positive_neighbors.shape)
         count_matrix = np.stack((positive_neighbors_pool, total_neighbors_pool-positive_neighbors_pool), axis=1)
         count_matrix = np.reshape(count_matrix, (-1,1,2))
-        # print(count_matrix.shape)
-        # print(sdkje)
         total_uncertainty, epistemic_uncertainty, aleatoric_uncertainty = unc.uncertainty_rl_avg(count_matrix) 
-        # total_uncertainty = rl_a + rl_e
-        # epistemic_uncertainty = rl_e
-        # aleatoric_uncertainty = rl_a
     elif "credal" in unc_method:
         for indp in range(len(X_pool)):
             credal_t[indp] = Credal_Uncertainty(total_neighbors_pool[indp], positive_neighbors_pool[indp])
@@ -257,15 +240,8 @@ class PWC_model(object):
          total_neighbors = self.total_neighbors_test
          positive_neighbors = self.positive_neighbors_test
          prob_prediction = np.array([positive_neighbors[ind]/total_neighbors[ind] if total_neighbors[ind] > 0 else 3 for ind in range(np.shape(x_test)[0])])
-     # print("before\n",prob_prediction)
          y_test_flip = 1 - y_test
          prob_prediction = np.where(prob_prediction == 3, y_test_flip, prob_prediction)
-         # print("after\n",prob_prediction)
-         # print("------------------------------------")
-         # print(y_test)
-         # exit()
          
          binary_prediction = np.where(prob_prediction > 0.5, 1, 0)
-         # print(">>> model \n",binary_prediction)
-         # print(">>> labels \n",y_test)
          return accuracy_score(y_test, binary_prediction)   

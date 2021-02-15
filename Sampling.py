@@ -4,9 +4,6 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import data_provider as dp
-# import a_DF as df
-# import a_eRF as erf
-# import a_BN as bn
 import a_Tree as tree
 import a_LR as lr
 import a_PW as pw
@@ -40,13 +37,8 @@ def active_learning(seed, features, target, prams, mode, algo, dir, log=True):
     np.random.seed(seed)
 
     s_time = time.time()
-    # if algo == "LR": # add feature vector of one for the LR to fix the overflow in exp
-    #     one_array = np.ones(len(features))
-    #     one_array = np.reshape(one_array, (-1,1))
-    #     features = np.append(one_array,features, axis=1)
     x_train_all, x_test, y_train_all, y_test = dp.split_data(features, target, split=prams["split"], seed=seed)
     
-    # normalizer = preprocessing.MinMaxScaler().fit(x_train_all) # see https://stats.stackexchange.com/questions/19523/need-for-centering-and-standardizing-data-in-regression
     normalizer = preprocessing.StandardScaler().fit(x_train_all)
     x_train_all = normalizer.transform(x_train_all)
     x_test = normalizer.transform(x_test)
@@ -58,8 +50,6 @@ def active_learning(seed, features, target, prams, mode, algo, dir, log=True):
         one_array = np.ones(len(x_test))
         one_array = np.reshape(one_array, (-1,1))
         x_test = np.append(one_array,x_test, axis=1)
-    if algo == "BN":
-        y_train_all, y_test_BN, model = bn.BN_init(x_train_all, x_test, y_train_all, y_test, prams, mode, seed) # not changing the y_test because I need it to stay as is for acc calculation by hand in the a_BN.py
     initial_train_percent = 0.1
     cut_index = int(len(features) * initial_train_percent)    
 
@@ -93,16 +83,7 @@ def active_learning(seed, features, target, prams, mode, algo, dir, log=True):
 
     for active_index in range(active_learning_steps+2):
         # print("[debug] main active learning loop > pool size ", len(x_U))
-        if algo == "DF":
-            # mode_df = mode.split('_')[0] # spliting the active selection mode (_a _e _t) from the unc method because DF dose not work with that
-            _ , t_unc_U, e_unc_U, a_unc_U, model = df.DF_run(x_train, x_U, y_train, y_U, prams, mode, seed, False) # run model
-        elif algo == "eRF":
-            # mode_df = mode.split('_')[0] # spliting the active selection mode (_a _e _t) from the unc method because DF dose not work with that
-            _ , t_unc_U, e_unc_U, a_unc_U, model = erf.eRF_run(x_train, x_U, y_train, y_U, prams, mode, seed, False) # run model
-        elif algo == "BN":
-            # mode_df = mode.split('_')[0] # spliting the active selection mode (_a _e _t) from the unc method because DF dose not work with that
-            acc , t_unc_U, e_unc_U, a_unc_U, model = bn.BN_run(x_train, x_U, y_train, y_U, x_test, y_test, prams, mode, seed, model, active_step=active_index) # run model
-        elif algo == "Tree":
+        if algo == "Tree":
             _ , t_unc_U, e_unc_U, a_unc_U, model = tree.Tree_run(x_train, x_U, y_train, y_U, prams, mode, seed) # run model
         elif algo == "PW":
             if(active_index == 0):
@@ -120,26 +101,11 @@ def active_learning(seed, features, target, prams, mode, algo, dir, log=True):
             print("[ERORR] Undefined Algo")
             exit()
 
-        # if algo == "BN":
-        #     # acc_list = [] # multiple runs and average of the acc
-        #     # for _ in range(prams["MC_samples"]):
-        #     #     acc_list.append(model.evaluate(x_test, y_test_BN, verbose=0)[1])
-        #     # acc_list = np.array(acc_list)
-        #     # print(">>> debug acc list ",acc_list)
-        #     # print(sdlfe)
-        #     # acc = np.mean(acc_list)
-
-        #     acc = model.evaluate(x_test, y_test_BN, verbose=0)[1] # single acc 
-        #     # print(f" {active_index}/{active_learning_steps+2} >>>>>> {acc}")
-        if algo != "BN":
-            acc = model.score(x_test, y_test) # get test acc
+        acc = model.score(x_test, y_test) # get test acc
             
         # print(acc)
         acc_history.append(acc) # append to history
 
-        # if run_number == 7:
-        #     print(f">>> acc {acc} | train len {len(x_train)} | pool len {len(x_U)} | batch size ", prams["batch_size"])
-        #     print(len(y_train) + len(y_U))
         if len(x_U) <= 0: # break out of the active learning if there is no more data in the pool
             unc_max_history.append(0)
             unc_mean_history.append(0)
@@ -169,33 +135,13 @@ def active_learning(seed, features, target, prams, mode, algo, dir, log=True):
             unc_std_history.append(unc_log.std())
             # print(f"active {mode} step[{active_index}] Selected_index={unc_log.argmax()}", f" | unc: max {unc_log.max()} min {unc_log.min()} mean {unc_log.mean()} std {unc_log.std()}")
 
-        if algo == "BN":
-            # x_train = x_U[:prams["batch_size"]] # only batch
-            # y_train = y_U[:prams["batch_size"]]
-            x_train = np.append(x_train,x_U[:prams["batch_size"]], axis=0) # all training
-            y_train = np.append(y_train,y_U[:prams["batch_size"]], axis=0)
-        else:
-            x_train = np.append(x_train,x_U[:prams["batch_size"]], axis=0) # add new high epistemic data point to the training data
-            y_train = np.append(y_train,y_U[:prams["batch_size"]])
+        x_train = np.append(x_train,x_U[:prams["batch_size"]], axis=0) # add new high epistemic data point to the training data
+        y_train = np.append(y_train,y_U[:prams["batch_size"]])
 
         x_U = x_U[prams["batch_size"]:] # remove that data point from x_U and y_U
         y_U = y_U[prams["batch_size"]:]
         if prams["batch_size"] > len(x_U): # fix last batch size
             prams["batch_size"] = len(x_U)
-    
-    # if log:
-    #     unc_mean_history = np.array(unc_mean_history)
-    #     unc_std_history = np.array(unc_std_history)
-    #     unc_max_history = np.array(unc_max_history)
-    #     steps = np.array(range(len(unc_mean_history)))
-
-    #     plt.plot(steps, unc_mean_history,label="mean")
-    #     plt.fill_between(steps, unc_mean_history - unc_std_history, unc_mean_history + unc_std_history, alpha=0.2)
-    #     plt.plot(steps, unc_max_history,label="Max")
-    #     plt.title(mode)
-    #     plt.legend()
-    #     plt.savefig(f"pic/sampling/run_unc_values/active_unc_value.png")
-    #     plt.close()
 
     e_time = time.time()
     run_time = int(e_time - s_time)
@@ -263,18 +209,6 @@ if __name__ == '__main__':
     # get data
     features, target = dp.load_data(data_name)
 
-    # Dimensionality reduction
-    # if prams["PCA"] != 0:
-    #     pca = PCA(n_components=prams["PCA"])
-    #     features = pca.fit(features).transform(features)
-
-    # _, counts = np.unique(target ,return_counts=True)
-    # max_class = counts.max()
-    # min_class = counts.min()
-    # baseline = max_class / (max_class + min_class)
-    # print(baseline)
-    # exit()
-
     ray.init()
     ray_array = []
     file_list = []
@@ -311,5 +245,3 @@ if __name__ == '__main__':
         mydb.commit()
         mycursor.execute(f"UPDATE experiments SET prams=\"{str(prams)}\" Where id={job_id}")
         mydb.commit()
-        # if prams["run_start"] != 0:
-        #     os.system("bash /home/mhshaker/projects/uncertainty/bash/run_sampling.sh")

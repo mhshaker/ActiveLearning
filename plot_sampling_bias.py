@@ -12,8 +12,7 @@ pic_dir = f"{base_dir}/pic/sampling"
 if not os.path.exists(pic_dir):
     os.makedirs(pic_dir)
 
-# data_list = ["parkinsons", "vertebral", "spect","ionosphere", "climate", "blod", "breast", "diabetes","bank", "QSAR", "spambase"]
-data_list = ["QSAR", "blod"]
+data_list = ["parkinsons", "vertebral", "spect","ionosphere", "climate", "blod", "breast", "diabetes","bank", "QSAR", "spambase"]
 algo = "Tree"
 run_name = "Paper_results_Bias"
 # result_type = "random"
@@ -25,7 +24,6 @@ for data in data_list:
     # plot_name   = "PCA_parkinson_epist"
     query1       = f"SELECT results, id, prams, result_type FROM experiments Where dataset='Jdata/{data}' AND algo='{algo}' AND result_type='ent' AND run_name='{run_name}'"
     query2       = f"SELECT results, id, prams, result_type FROM experiments Where dataset='Jdata/{data}' AND algo='{algo}' AND result_type='rl_a' AND run_name='{run_name}'"
-    # query       = f"SELECT results, id, prams, result_type FROM experiments Where id>=1393"
 
     ########################################################################################################################################################
 
@@ -69,24 +67,6 @@ for data in data_list:
         v_index_e = prams.index("}", v_index_s)
         batch_size = int(prams[v_index_s+len(search_pram) : v_index_e])
         # legend += "Batch: " + str(batch_size)
-
-        # prams = str(job[2])
-        # pram_name = "PCA"
-        # search_pram = f"'{pram_name}': "
-        # v_index_s = prams.index(search_pram)
-        # v_index_e = prams.index(",", v_index_s)
-        # pca = int(prams[v_index_s+len(search_pram) : v_index_e])
-        # legend += "PCA: " + str(pca)
-
-
-        # prams = str(job[2])
-        # pram_name = "max_depth"
-        # search_pram = f"'{pram_name}': "
-        # v_index_s = prams.index(search_pram)
-        # v_index_e = prams.index(",", v_index_s)
-        # max_depth = int(prams[v_index_s+len(search_pram) : v_index_e])
-        # legend += "Depth: " + str(max_depth)
-
 
         for text in job[3:]:
             legend += " " +str(text) 
@@ -163,15 +143,6 @@ for data in data_list:
         v_index_e = prams.index("}", v_index_s)
         batch_size = int(prams[v_index_s+len(search_pram) : v_index_e])
         # legend += "Batch: " + str(batch_size)
-
-        # prams = str(job[2])
-        # pram_name = "PCA"
-        # search_pram = f"'{pram_name}': "
-        # v_index_s = prams.index(search_pram)
-        # v_index_e = prams.index(",", v_index_s)
-        # pca = int(prams[v_index_s+len(search_pram) : v_index_e])
-        # legend += "PCA: " + str(pca)
-
 
         prams = str(job[2])
         pram_name = "max_depth"

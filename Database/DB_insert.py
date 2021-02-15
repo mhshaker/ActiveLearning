@@ -3,13 +3,11 @@ import os
 
 auto_run = False
 
-# data_names     = ["Jdata/vertebral","Jdata/parkinsons","Jdata/ionosphere", "Jdata/climate", "Jdata/blod", "Jdata/breast","Jdata/bank", "Jdata/QSAR"] # , "Jdata/spambase", "Jdata/madelon"
-data_names     = ["Jdata/spambase", "Jdata/madelon"] # "Jdata/hillvalley", "Jdata/scene"
+data_names     = ["Jdata/vertebral","Jdata/parkinsons","Jdata/ionosphere", "Jdata/climate", "Jdata/blod", "Jdata/breast","Jdata/bank", "Jdata/QSAR", "Jdata/spambase", "Jdata/madelon"] 
 algos          = ["PW"] # ,"LR"
 modes          = ["rl_e","rl_a", "ent", "credal", "random"] #["ent_e","ent_a","ent_t", "random"]  # ent_e","ent_a","ent_t  "set14", "set15", "set14.convex", "set15.convex", "ent.levi"
-# modes          = ["ent","evid_e", "evid_a","random"] 
 task           = "sampling"
-runs           = 100
+runs           = 1000
 prams = {
 # 'criterion'        : "entropy", # gini
 # 'max_depth'        : 2,
@@ -18,7 +16,6 @@ prams = {
 'PW_value'         : 20,
 'laplace_smoothing': 0,
 'split'            : 0.10,
-# 'PCA'              : 0,
 # 'credal_size'      : 20,
 # 'dropconnect_prob' : 0.2,
 # 'MC_samples'       : 20,
